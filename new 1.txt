@@ -1,0 +1,42 @@
+INITIALIZE buffer_list with an empty QUEUE
+INITIALIZE out_list with an empty QUEUE
+FOR each disk_size IN the disks
+	ENQUEUE disk_size into buffer_list
+	IF disk_size equal countOfDays THEN
+		INITIALIZE temp_list with an empty QUEUE
+		WHILE countOfDays IN buffer_list:
+			DEQUEUE from buffer_list
+			ENQUEUE countOfDays into temp_list
+			DECREMENT countOfDays by 1
+		ENDWHILE
+		ENQUEUE temp_list into out_list
+	ELSE
+		ENQUEUE empty QUEUE into out_list
+	ENDIF
+
+IF lines is NONE or LEN(lines) < 2
+	CALL setErrorMessage with 'Please enter 2 lines'
+ELSE
+	INITIALIZE countOfDays with lines[0]
+	IF countOfDays IS NOT a digit
+		CALL setErrorMessage with 'Invalid count of days'
+	ELSE
+		PARSE countOfDays TO Integer
+		INITIALIZE discSizes with lines[1]
+		BEGIN
+			CALL map with discSizes to parse disks to integer list
+			IF discSizes are not distinct or not in range(1, countOfDays)
+				CALL setErrorMessage with 'One or many disc are not in the range'
+			ELIF LEN(discSizes) < countOfDays
+				CALL setErrorMessage with 'Disc size mentioned are less than N'
+			ELSE
+				IF LEN(discSizes) > countOfDays
+					discSizes = discSizes till countOfDays
+				ENDIF
+				CALL set with countOfDays, discSizes
+			ENDIF
+		EXCEPTION
+			CALL setErrorMessage with 'Invalid disc sizes'
+		END
+	ENDIF
+ENDIF
